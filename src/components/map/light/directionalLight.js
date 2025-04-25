@@ -5,6 +5,7 @@ export default class DirectionalLight {
   constructor() {
     this.main = new Main();
     this.scene = this.main.scene;
+    this.player = this.main.player
 
     this.setInstance();
   }
@@ -26,7 +27,8 @@ export default class DirectionalLight {
     this.instance.shadow.camera.right = 200;
     this.instance.shadow.camera.top = 200;
     this.instance.shadow.camera.bottom = -200;
+    this.instance.target = this.player.instance
 
-    this.scene.add(this.instance);
+    this.player.instance.add(this.instance);
   }
 }

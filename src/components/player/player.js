@@ -1,132 +1,67 @@
 import * as THREE from "three";
-import vertexShader from "./shader/player.vertex.glsl";
-import fragmentShader from "./shader/player.fragment.glsl";
-import { UNITS } from "../../utils/constants";
 import Main from "../../main";
+import { UNITS } from "../../utils/constants";
+import { METADATA, TYPE } from "../../utils/metadata";
 
 export default class Player {
   constructor() {
+    
+    this.scoreText = document.querySelector("p#text-score")
+    this.upBtn = document.querySelector("button.up")
+    this.downBtn = document.querySelector("button.down")
+    this.leftBtn = document.querySelector("button.left")
+    this.rightBtn = document.querySelector("button.right")
+
     this.main = new Main();
     this.scene = this.main.scene;
-    this.lerpFactor = 0.1; // Controls the speed of interpolation (0-1)
+    this.map = this.main.map
     this.targetPosition = new THREE.Vector3();
     this.targetRotation = new THREE.Euler();
-    this.isJumping = false;
-    this.jumpHeight = 5; // Height of the jump
-    this.jumpProgress = 0; // Progress of the jump (0 to 1)
-    this.jumpSpeed = 0.05; // Speed of the jump animation
 
     this.moveClock = new THREE.Clock(false);
     this.moveQueue = [];
+    this.lastMove = ""
+
+    this.position = {
+      currentRow: 0,
+      currentTile: 0,
+    };
+
+    this.currentRotation = 0
 
     this.setInstance();
 
     window.addEventListener("keydown", (e) => {
-      if (this.isJumping) return; // Don't allow new jumps while already jumping
-
       if (e.key === "ArrowRight") {
-        // this.targetPosition.x += UNITS;
-        // this.targetRotation.z = Math.PI * 0.5;
-        // this.startJump();
-        this.moveQueue.push("right");
+       this.queueMove("right");
       }
       if (e.key === "ArrowLeft") {
-        // this.targetPosition.x -= UNITS;
-        // this.targetRotation.z = -Math.PI * 0.5;
-        // this.startJump();
-        this.moveQueue.push("left");
+       this.queueMove("left");
       }
       if (e.key === "ArrowUp") {
-        // this.targetPosition.y += UNITS;
-        // this.targetRotation.z = Math.PI;
-        // this.startJump();
-        this.moveQueue.push("up");
+       this.queueMove("up");
       }
       if (e.key === "ArrowDown") {
-        // this.targetPosition.y -= UNITS;
-        // this.targetRotation.z = 0;
-        // this.startJump();
-        this.moveQueue.push("down");
+       this.queueMove("down");
       }
     });
-  }
 
-  startJump() {
-    this.isJumping = true;
-    this.jumpProgress = 0;
-    this.initialY = this.player.position.y;
-  }
+    this.upBtn.addEventListener("click", () => {
+      this.queueMove("up");
+    })
 
-  updateJump() {
-    if (!this.isJumping && this.moveQueue.length <= 0) return;
+    this.downBtn.addEventListener("click", () => {
+      this.queueMove("down");
+    })
 
-    this.jumpProgress += this.jumpSpeed;
+    this.leftBtn.addEventListener("click", () => {
+      this.queueMove("left");
+    })
 
-    // Use a sine wave for smooth up and down motion
-    const jumpOffset = Math.sin(this.jumpProgress * Math.PI) * this.jumpHeight;
+    this.rightBtn.addEventListener("click", () => {
+      this.queueMove("right");
+    })
 
-    // Update the player's Y position
-    this.player.position.y = this.initialY + jumpOffset;
-
-    // End the jump when it's complete
-    if (this.jumpProgress >= 1) {
-      this.isJumping = false;
-      this.player.position.y = this.initialY;
-      this.moveQueue.shift();
-      this.moveClock.stop();
-    }
-  }
-
-  playerMove() {
-    if (!this.moveClock.running) this.moveClock.start();
-
-    const stepTime = 0.2; // Seconds it takes to take a step
-    const progress = Math.min(1, this.moveClock.getElapsedTime() / stepTime);
-
-    console.log(progress);
-    if (this.moveQueue[0] === "right") {
-      this.targetPosition.x += UNITS;
-      this.targetRotation.z = Math.PI * 0.5;
-    } else if (this.moveQueue[0] === "left") {
-      this.targetPosition.x -= UNITS;
-      this.targetRotation.z = -Math.PI * 0.5;
-    } else if (this.moveQueue[0] === "up") {
-      this.targetPosition.y += UNITS;
-      this.targetRotation.z = Math.PI;
-    } else if (this.moveQueue[0] === "down") {
-      this.targetPosition.y -= UNITS;
-      this.targetRotation.z = 0;
-    } else {
-      return;
-    }
-    this.startJump();
-    if (progress >= 1) {
-      this.moveQueue.shift();
-      this.moveClock.stop();
-    }
-  }
-
-  normalizeAngle(angle) {
-    // Normalize angle to be between -PI and PI
-    return ((angle + Math.PI) % (Math.PI * 2)) - Math.PI;
-  }
-
-  getShortestRotation(current, target) {
-    // Normalize both angles
-    const normalizedCurrent = this.normalizeAngle(current);
-    const normalizedTarget = this.normalizeAngle(target);
-
-    // Calculate the difference
-    let diff = normalizedTarget - normalizedCurrent;
-
-    // If the difference is greater than PI, go the other way
-    if (diff > Math.PI) {
-      diff -= Math.PI * 2;
-    } else if (diff < -Math.PI) {
-      diff += Math.PI * 2;
-    }
-
-    return current + diff;
   }
 
   setInstance() {
@@ -139,7 +74,7 @@ export default class Player {
     this.player.castShadow = true;
     this.player.receiveShadow = true;
 
-    this.player.position.z = 5;
+    this.instance.position.z = 5;
     this.targetPosition.copy(this.instance.position);
     this.targetRotation.copy(this.instance.rotation);
     this.initialY = this.player.position.y;
@@ -149,25 +84,164 @@ export default class Player {
   }
 
   update() {
-    // Lerp the position
-    this.instance.position.lerp(this.targetPosition, this.lerpFactor);
+    this.animatePlayer()
+    this.hitTest()
+  }
 
-    // Get the shortest path rotation
-    const shortestRotation = this.getShortestRotation(
-      this.player.rotation.z,
-      this.targetRotation.z
-    );
+  calculateFinalPosition(currentPosition, moves) {
+    return moves.reduce((position, direction) => {
+      if (direction === "up")
+        return {
+          rowIndex: position.rowIndex + 1,
+          tileIndex: position.tileIndex,
+        };
+      if (direction === "down")
+        return {
+          rowIndex: position.rowIndex - 1,
+          tileIndex: position.tileIndex,
+        };
+      if (direction === "left")
+        return {
+          rowIndex: position.rowIndex,
+          tileIndex: position.tileIndex - 1,
+        };
+      if (direction === "right")
+        return {
+          rowIndex: position.rowIndex,
+          tileIndex: position.tileIndex + 1,
+        };
+      return position;
+    }, currentPosition);
+  }
 
-    // Lerp the rotation
-    this.player.rotation.z = THREE.MathUtils.lerp(
-      this.player.rotation.z,
-      shortestRotation,
-      this.lerpFactor
-    );
+  queueMove(direction){
+    const finalPosition = this.calculateFinalPosition({
+      rowIndex: this.position.currentRow,
+      tileIndex: this.position.currentTile,
+    },[...this.moveQueue,direction])
 
-    this.playerMove();
+    if(finalPosition.rowIndex === -1 || finalPosition.tileIndex === -9 || finalPosition.tileIndex === 9){
+      return;
+    }
 
-    // Update jump animation
-    this.updateJump();
+    const finalRow = METADATA[finalPosition.rowIndex]
+    if(finalRow && finalRow.type === TYPE.FOREST &&finalRow?.trees?.some(tree => tree.tileIndex === finalPosition.tileIndex)){
+      return;
+    }
+    this.moveQueue.push(direction)
+  }
+
+  stepCompleted() {
+    if(this.moveQueue[0] === "right") this.position.currentTile +=1
+    if(this.moveQueue[0] === "left") this.position.currentTile -=1
+    if(this.moveQueue[0] === "up") this.position.currentRow +=1
+    if(this.moveQueue[0] === "down") this.position.currentRow -=1
+
+    if(this.moveQueue.length >= 1) this.lastMove = this.moveQueue[0]
+
+    if (this.position.currentRow > METADATA.length - 10) this.map.addRows();
+
+    
+    this.scoreText.innerHTML = this.position.currentRow
+
+    this.moveQueue.shift()
+  }
+  rotationCompleted() {
+    if(this.moveQueue[0] === "right") this.currentRotation = -Math.PI * 0.5
+    if(this.moveQueue[0] === "left")this.currentRotation = Math.PI * 0.5
+    if(this.moveQueue[0] === "up") this.currentRotation = 0 
+    if(this.moveQueue[0] === "down") this.currentRotation =  Math.PI
+  }
+
+  setPosition(progress){
+    const initialX = this.position.currentTile * UNITS
+    const initialY = this.position.currentRow * UNITS
+    let targetX = initialX;
+    let targetY = initialY;
+
+    if(this.moveQueue[0] === "right") targetX += UNITS;
+    if(this.moveQueue[0] === "left") targetX -= UNITS;
+    if(this.moveQueue[0] === "up") targetY += UNITS;
+    if(this.moveQueue[0] === "down") targetY -= UNITS;
+
+    this.instance.position.x = THREE.MathUtils.lerp(initialX, targetX,progress)
+    this.instance.position.y = THREE.MathUtils.lerp(initialY, targetY,progress)
+    this.player.position.z = Math.sin(progress * Math.PI) * 5
+  }
+
+  setRotation(progress){
+    let targetRotation = this.currentRotation
+
+    if(this.moveQueue[0] === "right") targetRotation = -Math.PI * 0.5
+    if(this.moveQueue[0] === "left") targetRotation = Math.PI * 0.5
+    if(this.moveQueue[0] === "up") targetRotation = 0
+    if(this.moveQueue[0] === "down") targetRotation = Math.PI
+
+    // Normalize angles to be between -PI and PI
+    const normalizeAngle = (angle) => {
+      return angle - 2 * Math.PI * Math.floor((angle + Math.PI) / (2 * Math.PI))
+    }
+
+    const current = normalizeAngle(this.currentRotation)
+    const target = normalizeAngle(targetRotation)
+    
+    // Calculate the shortest rotation
+    let shortestRotation = target - current
+    if (shortestRotation > Math.PI) shortestRotation -= 2 * Math.PI
+    if (shortestRotation < -Math.PI) shortestRotation += 2 * Math.PI
+
+    // Apply the rotation
+    this.player.rotation.z = THREE.MathUtils.lerp(current, current + shortestRotation, progress)
+  }
+
+  animatePlayer(){
+    if (!this.moveQueue.length) return;
+
+    if (!this.moveClock.running) this.moveClock.start();
+
+    const stepTime = 0.2
+    const progress = Math.min(1,this.moveClock.getElapsedTime() / stepTime)
+
+    this.setRotation(progress)
+    this.setPosition(progress)
+
+    if(progress >= 1){
+      this.rotationCompleted()
+      this.stepCompleted()
+      this.moveClock.stop()
+    }
+  }
+
+  hitTest(){
+    const row = METADATA[this.position.currentRow]
+    
+    if(row.type === TYPE.CAR){
+      const playerBoundingBox = new THREE.Box3();
+      playerBoundingBox.setFromObject(this.instance);
+      
+      row.vehicles.forEach(({ref}) => {
+        if (!ref) throw Error("Vehicle reference is missing");
+
+        const vehicleBoundingBox = new THREE.Box3();
+        vehicleBoundingBox.setFromObject(ref.instance);
+
+      if (playerBoundingBox.intersectsBox(vehicleBoundingBox)){
+        this.map.initializeGame()
+        this.scoreText.innerHTML = 0
+        // Initialize the Three.js player object
+   this.instance.position.x = 0;
+   this.instance.position.y = 0;
+   this.player.position.z = 5;
+   this.instance.children[0].position.z = 0;
+ 
+  //  Initialize metadata
+   this.position.currentRow = 0;
+   this.position.currentTile = 0;
+ 
+  //  Clear the moves queue
+   this.moveQueue.length = 0;
+      }
+      })
+    }
   }
 }

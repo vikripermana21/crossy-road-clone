@@ -17,10 +17,10 @@ export default class Camera {
 
   setInstance() {
     this.instance = new THREE.OrthographicCamera(
-      this.width / -2,
-      this.width / 2,
-      this.height / 2,
-      this.height / -2,
+      this.width / -8,
+      this.width / 8,
+      this.height / 8,
+      this.height / -8,
       -10,
       10000
     );

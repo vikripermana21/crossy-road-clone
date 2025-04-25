@@ -2,12 +2,28 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
+    
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
+    <div class="score">
+      <p id="text-score">0</p>
+    </div>
+
+    <div class="controls-container">
+      <div class="controls">
+        <button class="up">▲</button>
+          <button class="left">◀</button>
+          <button class="down">▼</button>
+          <button class="right">▶</button>
+      </div>
+    </div>
     <canvas class="webgl"></canvas>
     <script type="module" src="/src/main.js"></script>
   </body>

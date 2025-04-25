@@ -2,14 +2,14 @@ import * as THREE from "three";
 import Main from "../../../main";
 
 export default class Tree {
-  constructor(_grass) {
+  constructor(_grass,height) {
     this.main = new Main();
     this.scene = this.main.scene;
     this.grass = _grass;
     this.time = this.main.time;
+    this.height = height
 
     this.swingRandom = Math.floor(Math.random() * 10);
-    this.heightRandom = Math.floor(Math.random() * 2) === 1 ? 10 : 20;
 
     this.setInstance();
   }
@@ -21,7 +21,7 @@ export default class Tree {
       new THREE.MeshBasicMaterial({ color: "brown" })
     );
     this.crown = new THREE.Mesh(
-      new THREE.BoxGeometry(8, 8, this.heightRandom),
+      new THREE.BoxGeometry(8, 8, this.height),
       // new THREE.ShaderMaterial({
       //   vertexShader: vertexShader,
       //   fragmentShader: fragmentShader,
@@ -33,14 +33,14 @@ export default class Tree {
     );
     this.trunks.castShadow = true;
     this.crown.castShadow = true;
-    this.crown.position.z = this.heightRandom === 10 ? 10 : 15;
+    this.crown.position.z = this.height / 2 + 5;
 
     this.instance.add(this.trunks, this.crown);
     this.grass.group.add(this.instance);
   }
 
   update() {
-    this.crown.material.uniforms.uTime.value =
-      this.time.elapsed * (this.swingRandom * 0.0005);
+    // this.crown.material.uniforms.uTime.value =
+    //   this.time.elapsed * (this.swingRandom * 0.0005);
   }
 }

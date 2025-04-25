@@ -3,10 +3,11 @@ import { ROAD_COLOR, UNITS } from "../../../utils/constants";
 import Main from "../../../main";
 
 export default class Road {
-  constructor(row) {
+  constructor(row,parent) {
     this.main = new Main();
     this.scene = this.main.scene;
     this.row = row;
+    this.parent = parent
 
     this.setInstance();
   }
@@ -24,6 +25,6 @@ export default class Road {
     this.instance.position.y = this.row * UNITS;
 
     this.instance.add(this.road);
-    this.scene.add(this.instance);
+    this.parent.add(this.instance);
   }
 }

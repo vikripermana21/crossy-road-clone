@@ -1,7 +1,8 @@
 import * as THREE from "three";
 export default class Car {
-  constructor(_road) {
+  constructor(_road,color) {
     this.road = _road;
+    this.color = color
     this.setInstance();
   }
 
@@ -10,7 +11,7 @@ export default class Car {
 
     this.body = new THREE.Mesh(
       new THREE.BoxGeometry(20, 10, 7),
-      new THREE.MeshStandardMaterial({ color: "red" })
+      new THREE.MeshStandardMaterial({ color: this.color })
     );
 
     this.body.receiveShadow = true;

@@ -3,10 +3,12 @@ import Main from "../../../main";
 import { GRASS_COLOR, UNITS } from "../../../utils/constants";
 
 export default class Grass {
-  constructor(_row) {
+  constructor(_row,parent) {
     this.main = new Main();
     this.scene = this.main.scene;
+    this.map = this.main.map
     this.row = _row;
+    this.parent = parent
 
     this.setInstance();
   }
@@ -24,6 +26,6 @@ export default class Grass {
 
     this.group.add(this.instance);
 
-    this.scene.add(this.group);
+    this.parent.add(this.group);
   }
 }
