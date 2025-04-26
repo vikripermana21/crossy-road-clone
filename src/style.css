@@ -99,6 +99,7 @@ button::before {
   color: greenyellow;
   -webkit-text-stroke: 1px;
   -webkit-text-stroke-color: rgb(65, 106, 4);
+  white-space: nowrap;
 }
 .game-over div .game-over-text::before {
   content: "GAME OVER";
@@ -107,7 +108,7 @@ button::before {
   left: 5px;
   color: black;
   z-index: -1;
-  white-space: preserve nowrap;
+  white-space: nowrap;
 }
 
 .final-score {
