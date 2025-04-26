@@ -2,13 +2,16 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap"
+      rel="stylesheet"
+    />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
-    
+
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
@@ -19,11 +22,26 @@
     <div class="controls-container">
       <div class="controls">
         <button class="up">▲</button>
-          <button class="left">◀</button>
-          <button class="down">▼</button>
-          <button class="right">▶</button>
+        <button class="left">◀</button>
+        <button class="down">▼</button>
+        <button class="right">▶</button>
       </div>
     </div>
+
+    <!-- Game Over -->
+    <div class="game-over">
+      <div>
+        <p class="game-over-text">GAME OVER</p>
+        <div class="high-score-container">
+          <p>YOUR HIGH SCORE : <span class="high-score">0</span></p>
+        </div>
+        <p class="final-score">0</p>
+        <span class="retry">
+          <p>RETRY</p>
+        </span>
+      </div>
+    </div>
+
     <canvas class="webgl"></canvas>
     <script type="module" src="/src/main.js"></script>
   </body>

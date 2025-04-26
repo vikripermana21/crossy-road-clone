@@ -1,6 +1,6 @@
 * {
-  margin: 0px ;
-  padding: 0px ;
+  margin: 0px;
+  padding: 0px;
 }
 
 .webgl {
@@ -14,40 +14,40 @@
 .score {
   position: relative;
   z-index: 99;
-  font-family: "Pixelify Sans", sans-serif;
-  font-optical-sizing: auto;
+  font-family: "Jersey 10", sans-serif;
+  font-weight: 400;
   font-size: 120px;
   color: white;
   margin-left: 20px;
 }
 
-.controls-container{
+.controls-container {
   width: 100%;
- display: flex;
- justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
-.controls{
+.controls {
   position: fixed;
-  bottom: 10px;;
+  bottom: 10px;
   z-index: 99;
   display: grid;
- grid-template-columns: 1fr 1fr 1fr;
- gap: 5px;
- min-width: 300px;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5px;
+  min-width: 300px;
 }
 
-.bottom-button{
+.bottom-button {
   display: flex;
   gap: 10px;
   width: 100%;
 }
 
-.up{
+.up {
   grid-column: span 3;
 }
 
-button{
+button {
   padding: 10px;
   position: relative;
   background-color: aliceblue;
@@ -55,7 +55,7 @@ button{
   cursor: pointer;
 }
 
-button::before{
+button::before {
   content: "";
   width: 100%;
   height: 100%;
@@ -67,3 +67,65 @@ button::before{
   transition: all;
 }
 
+.game-over {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  visibility: hidden;
+}
+
+.game-over div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Jersey 10", sans-serif;
+  flex-direction: column;
+  font-weight: 400;
+  font-size: 5rem;
+  padding: 20px;
+  z-index: -2;
+}
+
+.game-over div .game-over-text {
+  position: relative;
+  color: greenyellow;
+  -webkit-text-stroke: 1px;
+  -webkit-text-stroke-color: rgb(65, 106, 4);
+}
+.game-over div .game-over-text::before {
+  content: "GAME OVER";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  color: black;
+  z-index: -1;
+  white-space: preserve nowrap;
+}
+
+.final-score {
+  font-family: "Jersey 10", sans-serif;
+  font-size: 240px;
+  color: aliceblue;
+}
+
+.retry {
+  font-size: 3rem;
+  background-color: rgb(192, 23, 23);
+  padding: 5px 10px;
+  color: aliceblue;
+  cursor: pointer;
+}
+
+.high-score-container {
+  font-size: 1.5rem !important;
+  color: aliceblue;
+  display: flex;
+  width: 100%;
+}

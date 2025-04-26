@@ -5,7 +5,7 @@ export default class DirectionalLight {
   constructor() {
     this.main = new Main();
     this.scene = this.main.scene;
-    this.player = this.main.player
+    this.player = this.main.player;
 
     this.setInstance();
   }
@@ -15,8 +15,8 @@ export default class DirectionalLight {
     this.instance.position.set(-100, -100, 100);
     this.instance.castShadow = true;
 
-    this.helper = new THREE.DirectionalLightHelper(this.instance, 1);
-    this.scene.add(this.helper);
+    // this.helper = new THREE.DirectionalLightHelper(this.instance, 1);
+    // this.scene.add(this.helper);
 
     // Configure shadow properties
     this.instance.shadow.mapSize.width = 2048;
@@ -27,7 +27,7 @@ export default class DirectionalLight {
     this.instance.shadow.camera.right = 200;
     this.instance.shadow.camera.top = 200;
     this.instance.shadow.camera.bottom = -200;
-    this.instance.target = this.player.instance
+    this.instance.target = this.player.instance;
 
     this.player.instance.add(this.instance);
   }
